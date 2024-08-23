@@ -7,6 +7,7 @@ probed_LM = "meta-llama/Meta-Llama-3-8B"
 extracted_layers = [5]
 truncation_method = "PCA"
 truncated_feature_size = 16
+HF_TOKEN = "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"
 # implement PCA
 
 dataset_name = "ambition"
@@ -38,7 +39,3 @@ EPOCHS = 3000
 early_stopping = True
 
 
-try:
-    HF_TOKEN = os.environ["HF_TOKEN"]
-except KeyError:
-    logger.error("HF_TOKEN not found in the environment")
