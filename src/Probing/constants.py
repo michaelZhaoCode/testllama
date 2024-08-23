@@ -39,3 +39,7 @@ EPOCHS = 3000
 early_stopping = True
 
 
+# try:
+#     HF_TOKEN = os.environ["HF_TOKEN"]
+# except KeyError:
+#     logger.error("HF_TOKEN not found in the environment")
