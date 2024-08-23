@@ -1,7 +1,6 @@
 import os
 import torch
 import torch.distributed as dist
-from torch.nn.parallel import DistributedDataParallel as DDP
 from transformers import BertTokenizerFast, AutoTokenizer
 import argparse
 
@@ -18,30 +17,32 @@ def cleanup():
     dist.destroy_process_group()
 
 
-def load_LM_distributed(LM_name, rank, world_size, HF_TOKEN=None):
+def load_LM_model_parallel(LM_name, rank, world_size, HF_TOKEN=None):
     setup(rank, world_size)
 
-    if "bert" in LM_name:
-        LM = custom_BertModel.from_pretrained(LM_name, output_hidden_states=True, use_auth_token=HF_TOKEN)
-        LM_tokenizer = BertTokenizerFast.from_pretrained(LM_name, use_auth_token=HF_TOKEN)
-    elif "llama" in LM_name.lower():
-        model_path = os.path.join(os.getcwd(), "LMs", LM_name)
-        LM = custom_LlamaForCausalLM.from_pretrained(
-            model_path, token=HF_TOKEN, output_hidden_states=True, use_auth_token=HF_TOKEN
-        )
-        LM_tokenizer = AutoTokenizer.from_pretrained(LM_name, token=HF_TOKEN)
-        LM_tokenizer.pad_token = LM_tokenizer.eos_token
+    # Assume custom_LlamaForCausalLM is your large model
+    model_path = os.path.join(os.getcwd(), "LMs", LM_name)
+    LM = custom_LlamaForCausalLM.from_pretrained(model_path, token=HF_TOKEN, output_hidden_states=True)
 
-    # Wrap the model in DistributedDataParallel
-    LM = LM.to(rank)
-    LM = DDP(LM, device_ids=[rank])
+    # Split the model layers across GPUs/nodes for model parallelism
+    # For example, if using two GPUs/nodes, you could assign half the layers to one GPU and the other half to the other GPU.
+
+    if rank == 0:
+        # Move first part of the model to GPU 0 (rank 0)
+        LM.part1 = LM.part1.to(rank)
+    elif rank == 1:
+        # Move second part of the model to GPU 1 (rank 1)
+        LM.part2 = LM.part2.to(rank)
+
+    LM_tokenizer = AutoTokenizer.from_pretrained(LM_name, token=HF_TOKEN)
+    LM_tokenizer.pad_token = LM_tokenizer.eos_token
 
     return LM, LM_tokenizer
 
 
-def run_inference(LM, LM_tokenizer, rank):
+def run_inference_model_parallel(LM, LM_tokenizer, rank, world_size):
     # Sample text input for inference
-    texts = ["This is a test.", "Distributed inference with PyTorch."]
+    texts = ["This is a test.", "Model parallel inference with PyTorch."]
 
     # Tokenize input texts
     inputs = LM_tokenizer(texts, padding=True, truncation=True, return_tensors="pt").to(rank)
@@ -50,20 +51,30 @@ def run_inference(LM, LM_tokenizer, rank):
     LM.eval()
 
     with torch.no_grad():  # Disable gradient computation for inference
-        # Perform inference
-        outputs = LM(**inputs)
 
-        # Access the model outputs
-        hidden_states = outputs.hidden_states[-1]  # The last hidden state
+        # In model parallelism, input data is passed through each part of the model on different devices
+        if rank == 0:
+            # Only process part 1 on rank 0
+            outputs_part1 = LM.part1(inputs)
 
-    # Print results (only by the rank 0 process to avoid duplicate printing)
-    if rank == 0:
-        print("Inference results (last hidden states):")
-        print(hidden_states)
+            # Send the intermediate outputs to the next part of the model on rank 1
+            dist.send(tensor=outputs_part1, dst=1)
+
+        elif rank == 1:
+            # Receive intermediate outputs from rank 0
+            inputs_part2 = torch.zeros_like(inputs).to(rank)
+            dist.recv(tensor=inputs_part2, src=0)
+
+            # Process the next part of the model
+            outputs_part2 = LM.part2(inputs_part2)
+
+            # Print results (only by rank 1 in this example)
+            print(f"Inference results (last hidden states from rank {rank}):")
+            print(outputs_part2)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Distributed Hugging Face Model Inference")
+    parser = argparse.ArgumentParser(description="Model Parallel Hugging Face Model Inference")
 
     parser.add_argument('--model_name', type=str, required=True, help="Hugging Face model name or path")
     parser.add_argument('--hf_token', type=str, required=False, help="Hugging Face authentication token")
@@ -74,10 +85,10 @@ def main():
     rank = int(os.environ['RANK'])  # rank of the current process (0 for master, 1 for worker)
 
     # Load the model and tokenizer with the specified Hugging Face folder and token
-    LM, LM_tokenizer = load_LM_distributed(args.model_name, rank, world_size, HF_TOKEN=args.hf_token)
+    LM, LM_tokenizer = load_LM_model_parallel(args.model_name, rank, world_size, HF_TOKEN=args.hf_token)
 
-    # Run inference
-    run_inference(LM, LM_tokenizer, rank)
+    # Run inference using model parallelism
+    run_inference_model_parallel(LM, LM_tokenizer, rank, world_size)
 
     # Cleanup the distributed environment
     cleanup()
