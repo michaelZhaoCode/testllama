@@ -7,8 +7,8 @@ def run(rank, world_size):
     # Initialize the process group
     dist.init_process_group(backend='nccl', init_method='env://', rank=rank, world_size=world_size)
 
-    # Assign the device based on the rank
-    device = torch.device(f'cuda:{rank}')
+    # Use only cuda:0 on each node, regardless of rank
+    device = torch.device(f'cuda:0')
 
     # Create a simple tensor on each GPU and print it
     tensor = torch.ones(1).to(device) * rank
@@ -32,5 +32,5 @@ def init_process(rank, world_size):
 
 
 if __name__ == "__main__":
-    world_size = 2  # Total number of GPUs/nodes
-    mp.spawn(init_process, args=(world_size,), nprocs=world_size, join=True)
+    world_size = 2  # Total number of nodes
+    mp.spawn(init_process, args=(world_size,), nprocs=1, join=True)
