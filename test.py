@@ -16,36 +16,61 @@ def cleanup():
 def load_LM_model_parallel(LM_name, rank, world_size, HF_TOKEN=None):
     setup(rank, world_size)
 
-    # Assume custom_LlamaForCausalLM is your large model
+    # Load the model and assign layers to different GPUs
     model_path = os.path.join(os.getcwd(), "LMs", LM_name)
     LM = custom_LlamaForCausalLM.from_pretrained(model_path, token=HF_TOKEN, output_hidden_states=True)
 
-    # Split the model layers across GPUs/nodes for model parallelism
+    # Split the model layers across GPUs for model parallelism
+    num_layers = len(LM.model.layers)
+    layers_per_rank = num_layers // world_size
+
     if rank == 0:
-        LM.part1 = LM.part1.to(rank)
+        # Assign first half of the layers to rank 0
+        LM.model.layers = LM.model.layers[:layers_per_rank]
+        LM.model.to(rank)
     elif rank == 1:
-        LM.part2 = LM.part2.to(rank)
+        # Assign second half of the layers to rank 1
+        LM.model.layers = LM.model.layers[layers_per_rank:]
+        LM.model.to(rank)
 
     LM_tokenizer = AutoTokenizer.from_pretrained(LM_name, token=HF_TOKEN)
     LM_tokenizer.pad_token = LM_tokenizer.eos_token
 
     return LM, LM_tokenizer
 
+
 def run_inference_model_parallel(LM, LM_tokenizer, rank, world_size):
+    # Sample text input for inference
     texts = ["This is a test.", "Model parallel inference with PyTorch."]
+
+    # Tokenize input texts
     inputs = LM_tokenizer(texts, padding=True, truncation=True, return_tensors="pt").to(rank)
 
+    # Set model in evaluation mode
     LM.eval()
+
     with torch.no_grad():
+        # Rank 0 processes the first part of the model
         if rank == 0:
-            outputs_part1 = LM.part1(inputs)
-            dist.send(tensor=outputs_part1, dst=1)
+            # Process through the layers assigned to rank 0
+            hidden_states = LM.model(inputs.input_ids)
+
+            # Send intermediate hidden states to rank 1
+            dist.send(tensor=hidden_states, dst=1)
+
+        # Rank 1 receives the intermediate activations and processes further
         elif rank == 1:
-            inputs_part2 = torch.zeros_like(inputs).to(rank)
-            dist.recv(tensor=inputs_part2, src=0)
-            outputs_part2 = LM.part2(inputs_part2)
-            print(f"Inference results (last hidden states from rank {rank}):")
-            print(outputs_part2)
+            # Receive intermediate hidden states from rank 0
+            intermediate_hidden_states = torch.zeros_like(inputs.input_ids).to(rank)
+            dist.recv(tensor=intermediate_hidden_states, src=0)
+
+            # Process through the remaining layers on rank 1
+            final_output = LM.model(intermediate_hidden_states)
+
+            # Print final output on rank 1
+            print(f"Inference results from rank {rank}:")
+            print(final_output)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Model Parallel Hugging Face Model Inference")
