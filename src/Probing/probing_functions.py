@@ -23,6 +23,10 @@ from src.Probing.probing_dataset_creator import probing_dataset_creator
 def load_LM(LM_name, HF_TOKEN=None, devices=None):
     if devices is None:
         devices = [torch.device(f'cuda:{i}') for i in range(torch.cuda.device_count())]
+        print("=============")
+        print(devices)
+        print(len(devices))
+        print("=============")
 
     if "bert" in LM_name.lower():
         LM = custom_BertModel.from_pretrained(
