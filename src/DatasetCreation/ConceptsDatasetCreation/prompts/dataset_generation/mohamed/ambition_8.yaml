@@ -1,0 +1,18 @@
+name: ambition_dataset_generation_prompt_2
+text: |
+  Generate enumerated examples which only has the s as the provided examples, but not in semantic meaning. Specifically, make the characters explicitly ambitious and aspiring. If the sentence is describing the characters in a negative manner, the example generated should still be indicating the presence of ambition, not the lack thereof.
+
+  Corporate settings are not necessarily ambitious or aspiring if the characters are not working towards a desire with effort, skill, or courage. (e.x. Having a startup or working late does not necessarily mean one is ambitious, the sentence has to show their effort, courage, or skill they are using to achieve their goal)
+
+  Even if the original sentence is negative or only descriptive, adjust it so that it is obvious that the character is both is ambitious and aspiring towards some goal. You may add more words to do so.
+
+continuation_text: |
+  Generate exactly {num_examples} examples, each of which has the same grammatical sentence structure (and the same number of sentences) as the following enumerated examples,
+  but with semantic differences to indicate the concept of ambition:
+
+
+description: prompt for generating a dataset of sentences that infer the concept of ambition
+meta:
+  authors:
+    - michelleyucollins
+version: '0.0.1'

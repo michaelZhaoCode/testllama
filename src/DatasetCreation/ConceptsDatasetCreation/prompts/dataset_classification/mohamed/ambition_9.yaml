@@ -1,0 +1,13 @@
+name: ambition_dataset_classification_prompt_1
+text: |
+  Classify the following input as either implying ambition or not.
+  Ambition is conveyed through a character's desire to achieve a goal, higher status, or result through their efforts,
+  skill, or courage.
+  If the given input implies ambition, output 1, else output 0.
+
+
+description: prompt for classifying whether the input infers the concept of ambition
+meta:
+  authors:
+    - Sihan Chen
+version: '0.0.1'

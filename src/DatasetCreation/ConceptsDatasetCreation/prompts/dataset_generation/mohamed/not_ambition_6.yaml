@@ -1,0 +1,16 @@
+name: ambition_dataset_generation_prompt_2
+text: |
+  Generate enumerated examples which mimics the provided sentences only in terms of structure, but not in semantic meaning.
+  Specifically, make the characters or setting absolutely unrelated to ambition.
+
+
+continuation_text: |
+  Generate exactly {num_examples} examples, each of which has the same grammatical sentence structure (and the same number of sentences) as the following enumerated examples,
+  but with semantic differences so that they are absolutely unrelated to ambition:
+
+
+description: prompt for generating a dataset of sentences that infer the concept of ambition
+meta:
+  authors:
+    - michelleyucollins
+version: '0.0.1'

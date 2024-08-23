@@ -1,0 +1,10 @@
+name: ambition_dataset_classification_prompt_0
+text: |
+  determine, in "true" or "false", whether the given input example infers the concept of {investigated_concept}.
+
+
+description: prompt for classifying whether the input infers the concept of ambition
+meta:
+  authors:
+    - mohamed-abdelwahab
+version: '0.0.1'

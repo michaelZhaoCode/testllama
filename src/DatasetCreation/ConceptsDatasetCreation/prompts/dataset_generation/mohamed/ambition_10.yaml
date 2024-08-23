@@ -1,0 +1,21 @@
+name: ambition_dataset_generation_prompt_2
+text: |
+  Generate enumerated examples which mimic the provided sentences only in terms of subject-verb order, but not in semantic meaning.
+  The semantic meaning should be changed so that the concept of ambition is obvious in the context.
+  Ambition is conveyed through a character's desire to achieve a goal, higher status, or result through their efforts,
+  skill, or courage.
+  The generated examples MUST show this in a positive way (the example must not convey a lack of ambition).
+  You can add a few more words to the original example length to achieve this, or you can use a slightly fewer number of words.
+  Do not repeat the ideas in the generated examples.
+  Do not refer to the characters as "The ___".
+
+continuation_text: |
+  This time, the examples should show ambition in a {context} context.
+  Generate exactly {num_examples} examples based on the given enumerated examples. Output only the example and its enumeration:
+
+
+description: prompt for generating a dataset of sentences that infer the concept of ambition
+meta:
+  authors:
+    - michelleyucollins
+version: '0.0.1'

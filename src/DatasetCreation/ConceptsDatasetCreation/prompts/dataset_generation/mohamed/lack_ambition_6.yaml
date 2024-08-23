@@ -1,0 +1,17 @@
+name: ambition_dataset_generation_prompt_2
+text: |
+  Generate enumerated examples which mimics the provided sentences only in terms of structure, but not in semantic meaning.
+  Specifically, make the characters or setting have an explicit observable lack of ambition.
+  A reminder that a lack of ambition is conveyed through a character's lack of desire to achieve a goal, level,
+  or result through their efforts, skill, or courage - this should be observable in your generated examples.
+
+continuation_text: |
+  Generate exactly {num_examples} examples, each of which has the same grammatical sentence structure (and the same number of sentences) as the following enumerated examples,
+  but with semantic differences to indicate the concept of the lack of ambition:
+
+
+description: prompt for generating a dataset of sentences that infer the concept of lack of ambition
+meta:
+  authors:
+    - michelleyucollins
+version: '0.0.1'

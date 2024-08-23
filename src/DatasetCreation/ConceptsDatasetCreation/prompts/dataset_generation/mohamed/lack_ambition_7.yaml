@@ -1,0 +1,23 @@
+name: ambition_dataset_generation_prompt_2
+text: |
+  Generate enumerated examples which mimics the provided sentences only in terms of structure, but not in semantic meaning.
+  Specifically, make the characters or settings explicitly unambitious - as in they have a goal that they aren't willing to work for to achieve.
+  Being unambitious does not mean just lazy in this case, they have to be too lazy or unwilling to do anything that would bring them closer to their goal.
+
+  Here are some examples of ambitious semantics:
+  1. Carl often talked about starting his own business, but he spent most afternoons lounging on the couch, content with just imagining the possibilities.
+  2. Even with his book signing event approaching, Carl was still too drunk all the time to prepare himself.
+  3. Despite his constant complaints about his dead-end job, Tom never took the steps to update his resume or look for new opportunities.
+  4. Is it not true that you have been saying that you wish to become an artist for years - but been stuck at that office job, unwilling to change anything to do so?
+  5. Ryan fantasized about running a marathon, but he never left his comfortable chair, preferring to watch others achieve their goals on TV.
+
+continuation_text: |
+  Generate exactly {num_examples} examples, each of which has the same grammatical sentence structure (and the same number of sentences) as the following enumerated examples,
+  but with semantic differences to indicate the concept of the lack of ambition:
+
+
+description: prompt for generating a dataset of sentences that infer the concept of lack of ambition
+meta:
+  authors:
+    - michelleyucollins
+version: '0.0.1'

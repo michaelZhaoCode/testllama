@@ -1,0 +1,23 @@
+name: ambition_dataset_generation_prompt_2
+text: |
+  Generate enumerated examples which mimics the provided sentences only in terms of structure, but not in semantic meaning.
+  Specifically, make the characters or settings explicitly ambitious.
+
+  Here are some examples of ambitious semantics:
+  1. At the pinnacle of the gleaming skyscraper, Evelyn surveyed the sprawling metropolis below, her mind already crafting the next phase of her plan to dominate the tech industry.
+  2. In the heart of the unforgiving desert, Zara forged ahead, determined to unearth the ancient treasure that would secure her place among the world's most renowned archaeologists.
+  3. Beneath the glittering chandeliers of the grand ballroom, Alexander maneuvered through the crowd with calculated grace, each conversation a stepping stone toward his ultimate goal of political supremacy.
+  4. I had explained all my musical scripts to her. Did she somehow sense that I was determined to become something more?
+  5. In the cozy café on the corner, Lena quietly worked on her novel, dreaming of someday seeing her book on the shelves of the local bookstore.
+
+
+continuation_text: |
+  Generate exactly {num_examples} examples, each of which has the same grammatical sentence structure (and the same number of sentences) as the following enumerated examples,
+  but with semantic differences to indicate the concept of ambition:
+
+
+description: prompt for generating a dataset of sentences that infer the concept of ambition
+meta:
+  authors:
+    - michelleyucollins
+version: '0.0.1'

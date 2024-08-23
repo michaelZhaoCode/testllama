@@ -1,0 +1,22 @@
+name: ambition_dataset_classification_prompt_1
+text: |
+  Ambition is conveyed through a character's desire to achieve a goal, higher status, or result through their efforts,
+  skill, or courage.
+
+  Not relevant examples include sentence not showing desire, a drive to achieve higher status, or characters showing no skill, efforts or courage.
+
+  If the given input is not relevant to {investigated_concept}, output 0.
+  If the given input infers a lack of {investigated_concept}, output -1.
+  If the given input infers {investigated_concept}, output 1.
+
+  Explain the example's relevance to ambition/lack of ambition using the definitions provided.
+  Don't forget to justify its non-relevance if the sentence is weakly related to ambition/lack of ambition.
+  You must write the explanation and a number as output at the end.
+
+
+
+description: prompt for classifying whether the input infers the concept of ambition
+meta:
+  authors:
+    - Sihan Chen
+version: '0.0.1'

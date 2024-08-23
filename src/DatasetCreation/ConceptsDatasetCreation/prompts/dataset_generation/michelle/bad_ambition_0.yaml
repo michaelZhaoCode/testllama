@@ -1,0 +1,16 @@
+name: ambition_dataset_generation_prompt_0
+text: |
+  Generate enumerated examples from which the concept of the lack of ambition is inferred - specifically where
+  the character has little or no ambition. The structure should match the provided example sentence,
+  but the meaning of the sentence should be different such that ambition can be found. A reminder that a lack of ambition
+  is conveyed through a character's lack of desire to achieve a goal, level, or result through their efforts, skill, or
+  courage - this should be observable in your generated examples.
+
+  Vary the scale and theme of the goals in all of your examples, keeping in mind examples generated in previous user prompts.
+
+
+description: prompt for generating a dataset of sentences that infer the concept of ambition
+meta:
+  authors:
+    - michelleyucollins
+version: '0.0.1'

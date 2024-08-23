@@ -1,0 +1,13 @@
+name: ambition_dataset_generation_prompt_0
+text: |
+  Generate {num_examples} examples that do not infer the concept of ambition.
+  Each example should be either a single sentence or multiple sentences.
+  The examples should be diverse - they should not be similar.
+  Each example should be numbered.
+
+
+description: prompt for generating a dataset of sentences that infer the concept of ambition
+meta:
+  authors:
+    - mohamed-abdelwahab
+version: '0.0.1'

@@ -1,0 +1,21 @@
+name: not_ambition_dataset_generation_prompt_3
+text: |
+  Generate {num_examples} examples unrelated to the concept of ambition.
+  These examples can consist of one or more sentences as long as it does not bring the concept to mind, even in a negative way, where there is an absence of it.
+  Make the examples long.
+  Vary the point of view of each example to include first, second, and third person examples.
+  Vary the tense used in each example, using a variety of present, past, and future tenses in your examples.
+  Your subjects must be human.
+  Do not focus on the setting, your examples must be character-focused.
+  Give more insight to the character without the use of settings, providing enough context with the character's actions such that one can infer the personality of the character.
+  Each example should be numbered.
+  Each example should only contain the example itself and the enumeration, with no additional annotation.
+
+
+
+not_ambition_2:
+  yaml:description: prompt for generating a dataset of sentences that do not infer the concept of ambition
+meta:
+  authors:
+    - michael-zhao
+version: '0.0.1'
