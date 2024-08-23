@@ -2,6 +2,7 @@ import os
 import torch
 import torch.distributed as dist
 from transformers import BertTokenizerFast, AutoTokenizer
+from customllama import custom_LlamaForCausalLM
 import argparse
 
 def setup(rank, world_size):
