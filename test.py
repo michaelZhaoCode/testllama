@@ -3,6 +3,7 @@ import torch
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
 from transformers import BertTokenizerFast, AutoTokenizer
+import argparse
 
 
 def setup(rank, world_size):
@@ -18,12 +19,12 @@ def load_LM_distributed(LM_name, rank, world_size, HF_TOKEN=None):
     setup(rank, world_size)
 
     if "bert" in LM_name:
-        LM = custom_BertModel.from_pretrained(LM_name, output_hidden_states=True)
-        LM_tokenizer = BertTokenizerFast.from_pretrained(LM_name)
+        LM = custom_BertModel.from_pretrained(LM_name, output_hidden_states=True, use_auth_token=HF_TOKEN)
+        LM_tokenizer = BertTokenizerFast.from_pretrained(LM_name, use_auth_token=HF_TOKEN)
     elif "llama" in LM_name.lower():
         model_path = os.path.join(os.getcwd(), "LMs", LM_name)
         LM = custom_LlamaForCausalLM.from_pretrained(
-            model_path, token=HF_TOKEN, output_hidden_states=True
+            model_path, token=HF_TOKEN, output_hidden_states=True, use_auth_token=HF_TOKEN
         )
         LM_tokenizer = AutoTokenizer.from_pretrained(LM_name, token=HF_TOKEN)
         LM_tokenizer.pad_token = LM_tokenizer.eos_token
@@ -59,11 +60,18 @@ def run_inference(LM, LM_tokenizer, rank):
 
 
 def main():
+    parser = argparse.ArgumentParser(description="Distributed Hugging Face Model Inference")
+
+    parser.add_argument('--model_name', type=str, required=True, help="Hugging Face model name or path")
+    parser.add_argument('--hf_token', type=str, required=False, help="Hugging Face authentication token")
+
+    args = parser.parse_args()
+
     world_size = 2  # total number of processes (2 nodes with 1 GPU each)
     rank = int(os.environ['RANK'])  # rank of the current process (0 for master, 1 for worker)
 
-    LM_name = "bert-base-uncased"
-    LM, LM_tokenizer = load_LM_distributed(LM_name, rank, world_size)
+    # Load the model and tokenizer with the specified Hugging Face folder and token
+    LM, LM_tokenizer = load_LM_distributed(args.model_name, rank, world_size, HF_TOKEN=args.hf_token)
 
     # Run inference
     run_inference(LM, LM_tokenizer, rank)
