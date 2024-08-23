@@ -1,9 +1,9 @@
 import torch
 import torch.distributed as dist
-import torch.multiprocessing as mp
+import os
 
 
-def run(rank, world_size):
+def run_distributed_test(rank, world_size):
     # Initialize the process group
     dist.init_process_group(backend='nccl', init_method='env://', rank=rank, world_size=world_size)
 
@@ -27,10 +27,10 @@ def run(rank, world_size):
     dist.destroy_process_group()
 
 
-def init_process(rank, world_size):
-    run(rank, world_size)
-
-
 if __name__ == "__main__":
-    world_size = 2  # Total number of nodes
-    mp.spawn(init_process, args=(world_size,), nprocs=1, join=True)
+    # Read the environment variables for rank and world size
+    rank = int(os.environ['RANK'])
+    world_size = int(os.environ['WORLD_SIZE'])
+
+    # Run the distributed test
+    run_distributed_test(rank, world_size)
