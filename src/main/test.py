@@ -17,6 +17,9 @@ def run_distributed_test(rank, world_size):
     # Synchronize across all GPUs
     dist.barrier()
 
+    # Debug message
+    print(f"Rank {rank}: Before all_reduce, tensor: {tensor.item()}")
+
     # All reduce (sum) across all nodes and GPUs
     dist.all_reduce(tensor, op=dist.ReduceOp.SUM)
 
