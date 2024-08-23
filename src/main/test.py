@@ -2,10 +2,18 @@ import torch
 import torch.distributed as dist
 import os
 
+import os
+import tempfile
+
 
 def run_distributed_test(rank, world_size):
-    # Initialize the process group
-    dist.init_process_group(backend='nccl', init_method='env://', rank=rank, world_size=world_size)
+    # Use file-based initialization method
+    temp_dir = tempfile.mkdtemp()
+    init_method = f"file://{os.path.join(temp_dir, 'sharedfile')}"
+
+    dist.init_process_group(backend='nccl', init_method=init_method, rank=rank, world_size=world_size)
+
+    # Rest of the code remains the same...
 
     # Use only cuda:0 on each node, regardless of rank
     device = torch.device(f'cuda:0')
