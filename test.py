@@ -9,6 +9,9 @@ import argparse
 def setup(rank, world_size):
     dist.init_process_group(backend="nccl", init_method="env://", rank=rank, world_size=world_size)
     torch.cuda.set_device(rank)
+    print(f"Process {rank}/{world_size} is initialized and using GPU {rank}")
+    dist.barrier()
+    print(f"Process {rank} has passed the barrier.")
 
 
 def cleanup():
