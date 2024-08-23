@@ -32,11 +32,15 @@ from src.Probing.probing_functions import train_probe
 
 import torch.distributed as dist
 
-# Initialize distributed environment
-dist.init_process_group(backend='nccl', init_method='env://')
+# Initialize the process group (this needs to be called on all nodes)
+dist.init_process_group(backend='nccl')
 
-# Update device setting for multi-GPU across nodes
-device = torch.device(f"cuda:{dist.get_rank()}" if torch.cuda.is_available() else "cpu")
+# Get the rank of the process (which node/GPU this is)
+rank = dist.get_rank()
+
+# Assign the correct GPU based on rank
+device = torch.device(f'cuda:{rank}')
+
 
 
 MAX_LAYER_LOOP = 1
