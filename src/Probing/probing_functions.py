@@ -1,5 +1,6 @@
 import os
 import time
+import torch
 
 from transformers import AutoTokenizer
 from transformers import BertTokenizerFast
